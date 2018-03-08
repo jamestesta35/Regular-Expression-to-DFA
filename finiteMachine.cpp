@@ -4,10 +4,13 @@
 #include <string>
 #include <vector>
 #include "finiteMachine.h"
+#include "expression.h"
 
 using namespace std;
 
-finiteMachine::finiteMachine(){}
+finiteMachine::finiteMachine(){
+  isDFA = false;
+}
 
 finiteMachine::finiteMachine(vector<string> states, vector<char> alphabet, map<string,map<char,vector<string> > > transitionTable, string startState, vector<string> acceptStates)
 {
@@ -16,6 +19,17 @@ finiteMachine::finiteMachine(vector<string> states, vector<char> alphabet, map<s
   transitionTable_ = transitionTable;
   startState_ = startState;
   acceptStates_ = acceptStates;
+  isDFA = false;
+}
+
+finiteMachine::finiteMachine(string regex){
+  expression ex(regex);
+  string start = "q0";
+  states_.push_back(start);
+  startState_ = start;
+  string finalState = ex.toNFA(start, &states_, &transitionTable_, &alphabet_);
+  acceptStates_.push_back(finalState);
+  isDFA = false;
 }
 
 bool run2(string input, map<string,map<char,vector<string> > > transitionTable, string startState, vector<string> acceptStates, vector<char>alphabet){
@@ -39,9 +53,11 @@ bool run2(string input, map<string,map<char,vector<string> > > transitionTable, 
 }
 
 bool finiteMachine::run(string input){
-  //vector<string> epsilons;
-  //string startState = getStartState();
-  //return run_eps(startState, input, epsilons);
+  if(!isDFA){
+    vector<string> epsilons;
+    string startState = getStartState();
+    return run_eps(startState, input, epsilons);
+  }
   return run2(input, transitionTable_, startState_, acceptStates_, alphabet_);
 }
 

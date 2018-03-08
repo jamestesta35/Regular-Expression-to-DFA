@@ -1,31 +1,25 @@
-all: main expression newls
-
-main: main.o dfa.o
-	g++ -o main main.o dfa.o
-
-main.o: main.cpp
-	g++ -c main.cpp
+all: ls_main regex_main
 
 dfa.o: dfa.cpp
 	g++ -c dfa.cpp
 
-expression: expression.o mainExpression.o finiteMachine.o
-	g++ -o expression expression.o mainExpression.o finiteMachine.o
-
 expression.o: expression.cpp
 	g++ -c expression.cpp
-
-mainExpression.o: mainExpression.cpp
-	g++ -c mainExpression.cpp
 
 finiteMachine.o: finiteMachine.cpp
 	g++ -c finiteMachine.cpp
 
-newls: newls.o
-	g++ -o newls newls.o
+ls_main.o: ls_main.cpp
+	g++ -c ls_main.cpp
 
-newls.o: newls.cpp
-	g++ -c newls.cpp
+ls_main: ls_main.o finiteMachine.o expression.o
+	g++ -o ls_main ls_main.o finiteMachine.o expression.o
+
+regex_main.o: regex_main.cpp
+	g++ -c regex_main.cpp
+
+regex_main: regex_main.o finiteMachine.o expression.o
+	g++ -o regex_main regex_main.o finiteMachine.o expression.o
 
 clean:
-	rm *.o
+	rm *.o regex_main ls_main
