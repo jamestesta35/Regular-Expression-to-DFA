@@ -7,6 +7,25 @@
 
 void help(){
   std::cout << "This is the help menu for regex_main" << std::endl;
+  std::cout << "To use: $./regex_main\n";
+  std::cout << "Usage: regex_main [options] [regular expression]" << std::endl;
+  std::cout << "Options: -h = Help" << std::endl;
+  std::cout << "         -u = Usage" << std::endl;
+  std::cout << "Regular Expression:" << std::endl;
+  std::cout << "\tCharacters: ascii characters 'space' -> '~'\n";
+  std::cout << "\t            \\d: One digit from 0-9\n";
+  std::cout << "\t            \\w: One word character (letter, digit, underscore)\n";
+  std::cout << "\t            \\s: One whitespace character (space, tab, newline, carriage return, vertical tab)\n";
+  std::cout << "\t            \\D: One character that is not a digit\n";
+  std::cout << "\t            \\W: One character that is not a word character\n";
+  std::cout << "\t            \\S: One character that is not a whitespace character\n";
+  std::cout << "\t            . : Wild card (space -> ~)\n";
+  std::cout << "\tSequences:  [...]: Any character in the [] ([abc], [3d8])\n";
+  std::cout << "\t            [.-.]: Any character between the two ascii characters ([a-z], [0-9])\n";
+  std::cout << "\tOther:      *    : 0 or more times applied to the previous group or character\n";
+  std::cout << "\t            (...): Capture Group to group sequences of characters/strings\n";
+  std::cout << "\tNote: You can concatinate these characters/sequences by typing them next to each other in a string format\n";
+  std::cout << std::endl;
 }
 
 void usage(){
@@ -24,6 +43,7 @@ int main(int var_num, char** vars){
 
   
   for(int i = 1; i < var_num; ++i){
+    std::cout << i << " - " << vars[i] << std::endl; 
     if((string)vars[i] == "-h" || (string)vars[i] == "-help" || (string)vars[i] == "-H"){
       help_var = true;
     } else if ((string)vars[i] == "-u"){

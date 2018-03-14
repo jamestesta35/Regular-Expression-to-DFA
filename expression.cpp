@@ -95,9 +95,7 @@ string expression::termToNFA(string character, string startState, vector<string>
   string newState = "q" + to_string(states->size());
   states->push_back(newState);
   if(character.size() == 1){
-    if(character[0] == '$' || character[0] == '^'){
-      cerr << "Illegal character: " << character[0] << endl;
-    } else if (character[0] == '\'' || character[0] == '['){
+    if (character[0] == '\'' || character[0] == '['){
       cerr << "Character " << character[0] << "shouldnt be only character in term" << endl;
     } else if (character[0] == '.'){
       for(int i = ' '; i <= '~'; ++i){
@@ -243,10 +241,16 @@ string expression::termToNFA(string character, string startState, vector<string>
 	    alphabet->push_back(char(j));
 	  }
 	}
+      case '*':
+	transitionTable->operator[](startState)['*'].push_back(newState);
+	if(find(alphabet->begin(), alphabet->end(), '*') == alphabet->end()){
+	  alphabet->push_back('*');
+	}
       default:
 	break;
       }
     }
+    
     //THIS MUST BE A CHARACTER ESCAPE OR A GROUP OF CHARACTERS
   }
   return newState;
