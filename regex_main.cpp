@@ -16,20 +16,21 @@ void usage(){
 int main(int var_num, char** vars){
   DIR *dp;
   struct dirent *ep;
-  std::string regex, file, input;
+  std::string regex, file, input, reg;
   std::ifstream infile;
-  int lineCount;
+  int lineCount, total = 0;
   bool help_var = false;
   bool usage_var = false;
 
+  
   for(int i = 1; i < var_num; ++i){
     if((string)vars[i] == "-h" || (string)vars[i] == "-help" || (string)vars[i] == "-H"){
       help_var = true;
     } else if ((string)vars[i] == "-u"){
       usage_var = true;
     } else {
-      if(regex.empty()){
-	regex = string(vars[i]);
+      if(reg.empty()){
+	reg = string(vars[i]);
       } else {
 	cout << "Too many variables. Exiting." << std::endl;
 	return 2;
@@ -49,14 +50,14 @@ int main(int var_num, char** vars){
     return 1;
   }
 
-  if(regex.empty()){
+  if(reg.empty()){
     std::cout << "Expected a regular expression" << endl;
     return 3;
   }
   
-  std::cout << "Type the regular expression:" << endl;
-  std::cin >> regex;
-  regex = ".*" + regex + ".*";
+  //std::cout << "Type the regular expression:" << endl;
+  //std::cin >> regex;
+  regex = ".*" + reg + ".*";
   expression express(regex);
   finiteMachine NFA(regex);
   finiteMachine DFA = NFA.toDFA();
@@ -72,11 +73,12 @@ int main(int var_num, char** vars){
 	  while (getline( infile, input )){
 	    if(DFA.run(input)){
 	      std::cout << file << ":" << lineCount << ":" << input << std::endl;
+	      ++total;
 	    }
 	    ++lineCount;
 	  }
 	} else {
-	  std::cout << "Warning: Unable to open " << file << " for reading. Unable to check for regex string." << endl;
+	  std::cout << "WARNING: Unable to open " << file << " for reading. Unable to check for regex string." << endl;
 	}
 	infile.close();
       }
@@ -85,6 +87,8 @@ int main(int var_num, char** vars){
   else{
     std::cerr << "Couldn't open the directory" << std::endl;
   }
+
+  std::cout << "Found " << total << " results for: " << reg << std::endl;
   
   return 0;
 }
