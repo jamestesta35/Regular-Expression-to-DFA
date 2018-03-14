@@ -5,6 +5,12 @@
 #include "finiteMachine.h"
 #include "expression.h"
 
+/*
+  Function: help()
+  Arguments: None
+  Returns: None
+  Description: Gives more detailed syntax and description about regex_main
+*/
 void help(){
   std::cout << "This is the help menu for regex_main" << std::endl;
   std::cout << "To use: $./regex_main\n";
@@ -28,11 +34,25 @@ void help(){
   std::cout << std::endl;
 }
 
+/*
+  Function: usege()
+  Arguments: None
+  Returns: None
+  Description: Gives syntax for regex_main
+*/
 void usage(){
   std::cout << "Usage: regex_main [options] [regular expression]" << std::endl;
 }
 
+/*
+  Function: main()
+  Arguments: None
+  Returns: int
+  Description: Main driver for regex_main
+*/
 int main(int var_num, char** vars){
+
+  //Variable declaration
   DIR *dp;
   struct dirent *ep;
   std::string regex, file, input, reg;
@@ -41,14 +61,13 @@ int main(int var_num, char** vars){
   bool help_var = false;
   bool usage_var = false;
 
-  
+  //Start of command line argument section
   for(int i = 1; i < var_num; ++i){
-    std::cout << i << " - " << vars[i] << std::endl; 
-    if((string)vars[i] == "-h" || (string)vars[i] == "-help" || (string)vars[i] == "-H"){
+    if((string)vars[i] == "-h" || (string)vars[i] == "-help" || (string)vars[i] == "-H"){ //Help menu
       help_var = true;
-    } else if ((string)vars[i] == "-u"){
+    } else if ((string)vars[i] == "-u"){ //Usage
       usage_var = true;
-    } else {
+    } else { //Must be regular expression
       if(reg.empty()){
 	reg = string(vars[i]);
       } else {
@@ -57,31 +76,36 @@ int main(int var_num, char** vars){
       }
     }
   }
-
+  //Show usage
   if(usage_var){
     usage();
   }
-
+  //Show help menu
   if(help_var){
     help();
   }
-
+  //End if help or usage is shown
   if(usage_var || help_var){
     return 1;
   }
-
+  //End if 
   if(reg.empty()){
     std::cout << "Expected a regular expression" << endl;
     return 3;
   }
-  
-  //std::cout << "Type the regular expression:" << endl;
-  //std::cin >> regex;
+  //End of the command line arugment section
+  //Start of regex section
+
+  //Regex will search for sequences inside of lines so add .* so check inside the line
   regex = ".*" + reg + ".*";
+  
+  //Create the DFA
+  //Regular Expression -> NFA -> DFA
   expression express(regex);
   finiteMachine NFA(regex);
   finiteMachine DFA = NFA.toDFA();
-  
+
+  //Run through all files in the current directory
   dp = opendir ("./");
   if (dp != NULL)
     {
@@ -90,7 +114,9 @@ int main(int var_num, char** vars){
 	infile.open(file);
 	if(infile){
 	  lineCount = 1;
+	  //Run through each line for the current file
 	  while (getline( infile, input )){
+	    //If the line contains the regular expression print it to screen
 	    if(DFA.run(input)){
 	      std::cout << file << ":" << lineCount << ":" << input << std::endl;
 	      ++total;
@@ -107,7 +133,7 @@ int main(int var_num, char** vars){
   else{
     std::cerr << "Couldn't open the directory" << std::endl;
   }
-
+  //Final output for the regex_main
   std::cout << "Found " << total << " results for: " << reg << std::endl;
   
   return 0;
