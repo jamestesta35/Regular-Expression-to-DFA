@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "expression.h"
 
 using namespace std;
 
@@ -29,6 +30,7 @@ class finiteMachine{
 		string startState,
 		vector<string> acceptStates);
   finiteMachine(string regex);
+  finiteMachine(expression ex);
   bool run(string input);
   finiteMachine toDFA();
   string getStartState();

@@ -18,6 +18,9 @@ void help(){
   std::cout << "Options: -h = Help" << std::endl;
   std::cout << "         -u = Usage" << std::endl;
   std::cout << "         -v = Verbose Mode" << std::endl;
+  std::cout << "              - Adds: Opening File, Finished Checking File" << std::endl;
+  std::cout << "         -v+ = Verbose Plus Mode" << std::endl;
+  std::cout << "              - Adds: All Verbose Mode functionality, Print DFA Used, Opening File, Checing Line" << std::endl;
   std::cout << "Regular Expression:" << std::endl;
   std::cout << "\tCharacters: ascii characters 'space' -> '~'\n";
   std::cout << "\t            \\d: One digit from 0-9\n";
@@ -84,6 +87,7 @@ int main(int var_num, char** vars){
       }
     }
   }
+
   //Show usage
   if(usage_var){
     usage();
@@ -112,7 +116,8 @@ int main(int var_num, char** vars){
   expression express(regex);
   finiteMachine NFA(regex);
   finiteMachine DFA = NFA.toDFA();
-  DFA.printMachine();
+  if(verbosePlus)
+    DFA.printMachine();
   //Run through all files in the current directory
   dp = opendir ("./");
   if (dp != NULL)

@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include "finiteMachine.h"
-#include "expression.h"
 
 using namespace std;
 
@@ -32,19 +31,27 @@ finiteMachine::finiteMachine(string regex){
   isDFA = false;
 }
 
+finiteMachine::finiteMachine(expression ex){
+  string start = "q0";
+  states_.push_back(start);
+  startState_ = start;
+  string finalState = ex.toNFA(start, &states_, &transitionTable_, &alphabet_);
+  acceptStates_.push_back(finalState);
+  isDFA = false;
+}
+
 bool run2(string input, map<string,map<char,vector<string> > > transitionTable, string startState, vector<string> acceptStates, vector<char>alphabet){
   string state = startState;
   vector<string> states;
-  //cout << input << endl;
-  //cout << state << endl;
   for(int i = 0; i < input.size(); ++i){
     if(find(alphabet.begin(), alphabet.end(), input[i]) == alphabet.end()){
       return false;
     }
     states = transitionTable[state][input[i]];
-    //cout << states[0] << endl;;
+    if(states.size() == 0){
+      return false;
+    }
     state = states[0];
-      
   }
   if(find(acceptStates.begin(), acceptStates.end(), state) == acceptStates.end()){
     return false;
@@ -53,9 +60,7 @@ bool run2(string input, map<string,map<char,vector<string> > > transitionTable, 
 }
 
 bool finiteMachine::run(string input){
-  //cout << "Running! - " << input << "\n";
   if(!isDFA){
-    std::cout << "Running long finite 'Run'\n";
     vector<string> epsilons;
     string startState = getStartState();
     return run_eps(startState, input, epsilons);
