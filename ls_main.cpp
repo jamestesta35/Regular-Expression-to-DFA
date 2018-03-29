@@ -11,7 +11,7 @@ int main(){
   std::cout << "Type the regular expression:" << endl;
   std::cin >> regex;
   regex = ".*" + regex + ".*";
-  //expression express(regex);
+  expression express(regex);
   finiteMachine NFA(regex);
   finiteMachine DFA = NFA.toDFA();
   

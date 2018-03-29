@@ -53,7 +53,9 @@ bool run2(string input, map<string,map<char,vector<string> > > transitionTable, 
 }
 
 bool finiteMachine::run(string input){
+  //cout << "Running! - " << input << "\n";
   if(!isDFA){
+    std::cout << "Running long finite 'Run'\n";
     vector<string> epsilons;
     string startState = getStartState();
     return run_eps(startState, input, epsilons);
@@ -132,8 +134,10 @@ finiteMachine finiteMachine::toDFA(){
 
   //TO DO: Maybe take out the empty state name. It isnt a big deal but could look better
   
+  finiteMachine newMachine = finiteMachine(newStates, alphabet_, newTransitionTable, newStartState, newAcceptStates);
+  newMachine.isDFA = true;
   
-  return finiteMachine(newStates, alphabet_, newTransitionTable, newStartState, newAcceptStates);
+  return newMachine;
 }
 
 bool finiteMachine::run_sub(string currentState, string input){

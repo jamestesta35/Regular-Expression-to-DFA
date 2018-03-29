@@ -17,6 +17,7 @@ void help(){
   std::cout << "Usage: regex_main [options] [regular expression]" << std::endl;
   std::cout << "Options: -h = Help" << std::endl;
   std::cout << "         -u = Usage" << std::endl;
+  std::cout << "         -v = Verbose Mode" << std::endl;
   std::cout << "Regular Expression:" << std::endl;
   std::cout << "\tCharacters: ascii characters 'space' -> '~'\n";
   std::cout << "\t            \\d: One digit from 0-9\n";
@@ -57,9 +58,11 @@ int main(int var_num, char** vars){
   struct dirent *ep;
   std::string regex, file, input, reg;
   std::ifstream infile;
-  int lineCount, total = 0;
+  int lineCount, total = 0, currentTotal;
   bool help_var = false;
   bool usage_var = false;
+  bool verbose = false;
+  bool verbosePlus = false;
 
   //Start of command line argument section
   for(int i = 1; i < var_num; ++i){
@@ -67,11 +70,16 @@ int main(int var_num, char** vars){
       help_var = true;
     } else if ((string)vars[i] == "-u"){ //Usage
       usage_var = true;
+    } else if ((string)vars[i] == "-v"){ //Verbose Mode
+      verbose = true;
+    }  else if ((string)vars[i] == "-v+"){ //Verbose plus Mode
+      verbose = true;
+      verbosePlus = true;
     } else { //Must be regular expression
       if(reg.empty()){
 	reg = string(vars[i]);
       } else {
-	cout << "Too many variables. Exiting." << std::endl;
+	cout << "Unknown Variable: " << (string)vars[i] << ", Exiting!" << std::endl;
 	return 2;
       }
     }
@@ -104,22 +112,30 @@ int main(int var_num, char** vars){
   expression express(regex);
   finiteMachine NFA(regex);
   finiteMachine DFA = NFA.toDFA();
-
+  DFA.printMachine();
   //Run through all files in the current directory
   dp = opendir ("./");
   if (dp != NULL)
     {
       while ((ep = readdir (dp))){
 	file = ep->d_name;
+	if(verbosePlus)
+	    std::cout << "Opening file: " << file << endl;
 	infile.open(file);
 	if(infile){
 	  lineCount = 1;
+	  currentTotal = 0;
+	  if(verbose)
+	    std::cout << "Opened file: " << file << endl;
 	  //Run through each line for the current file
 	  while (getline( infile, input )){
 	    //If the line contains the regular expression print it to screen
+	    if(verbosePlus)
+	      std::cout << "Checking file: " << file << " line: " << lineCount << endl;
 	    if(DFA.run(input)){
 	      std::cout << file << ":" << lineCount << ":" << input << std::endl;
 	      ++total;
+	      ++currentTotal;
 	    }
 	    ++lineCount;
 	  }
@@ -127,6 +143,8 @@ int main(int var_num, char** vars){
 	  std::cout << "WARNING: Unable to open " << file << " for reading. Unable to check for regex string." << endl;
 	}
 	infile.close();
+	if(verbose)
+	  std::cout << "Finished checking file: " << file << "\nFound " << currentTotal << " results in file: " << file << endl;
       }
       (void) closedir (dp);
     }
