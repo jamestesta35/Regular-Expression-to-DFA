@@ -3,7 +3,7 @@
 #include <string>
 #include <dirent.h>
 #include "finiteMachine.h"
-#include "expression.h"
+//#include "expression.h"
 
 /*
   Function: help()
@@ -15,7 +15,9 @@ void help(){
   std::cout << "This is the help menu for regex_main" << std::endl;
   std::cout << "To use: $./regex_main\n";
   std::cout << "Usage: regex_main [options] [regular expression]" << std::endl;
-  std::cout << "Options: -h = Help" << std::endl;
+  std::cout << "Options: -f = File" << std::endl;
+  std::cout << "              - The next argument will be the specific file to check" << std::endl;
+  std::cout << "         -h = Help" << std::endl;
   std::cout << "         -u = Usage" << std::endl;
   std::cout << "         -v = Verbose Mode" << std::endl;
   std::cout << "              - Adds: Opening File, Finished Checking File" << std::endl;
@@ -48,9 +50,28 @@ void usage(){
   std::cout << "Usage: regex_main [options] [regular expression]" << std::endl;
 }
 
+int checkFile(std::string file, std::ifstream* infile, finiteMachine* DFA, bool verbose, bool verbosePlus){
+  int lineCount = 1;
+  int currentTotal = 0;
+  std::string input;
+  //Run through each line for the current file
+  while (getline( *infile, input )){
+    //If the line contains the regular expression print it to screen
+    if(verbosePlus)
+      std::cout << "Checking file: " << file << " line: " << lineCount << endl;
+    if(DFA->run(input)){
+      std::cout << file << ":" << lineCount << ":" << input << std::endl;
+      ++currentTotal;
+    }
+    ++lineCount;
+  }
+  return currentTotal;
+}
+
 /*
   Function: main()
-  Arguments: None
+  Arguments: int var_num - number of command line arguments
+             char** vars - array of command line arguments
   Returns: int
   Description: Main driver for regex_main
 */
@@ -59,9 +80,9 @@ int main(int var_num, char** vars){
   //Variable declaration
   DIR *dp;
   struct dirent *ep;
-  std::string regex, file, input, reg;
+  std::string regex, file = "", reg;
   std::ifstream infile;
-  int lineCount, total = 0, currentTotal;
+  int total = 0, currentTotal = 0;
   bool help_var = false;
   bool usage_var = false;
   bool verbose = false;
@@ -75,14 +96,19 @@ int main(int var_num, char** vars){
       usage_var = true;
     } else if ((string)vars[i] == "-v"){ //Verbose Mode
       verbose = true;
-    }  else if ((string)vars[i] == "-v+"){ //Verbose plus Mode
+    } else if ((string)vars[i] == "-v+"){ //Verbose plus Mode
       verbose = true;
       verbosePlus = true;
+    } else if ((string)vars[i] == "-f"){
+      if(++i >= var_num){
+	std::cout << "Must provide a file after -f" << std::endl;;
+      }
+      file = (string)vars[i];
     } else { //Must be regular expression
       if(reg.empty()){
 	reg = string(vars[i]);
       } else {
-	cout << "Unknown Variable: " << (string)vars[i] << ", Exiting!" << std::endl;
+	std::cout << "Unknown Variable: " << (string)vars[i] << ", Exiting!" << std::endl;
 	return 2;
       }
     }
@@ -102,7 +128,7 @@ int main(int var_num, char** vars){
   }
   //End if 
   if(reg.empty()){
-    std::cout << "Expected a regular expression" << endl;
+    std::cout << "Expected a regular expression" << std::endl;
     return 3;
   }
   //End of the command line arugment section
@@ -113,48 +139,49 @@ int main(int var_num, char** vars){
   
   //Create the DFA
   //Regular Expression -> NFA -> DFA
-  expression express(regex);
+  //expression express(regex);
   finiteMachine NFA(regex);
   finiteMachine DFA = NFA.toDFA();
   if(verbosePlus)
     DFA.printMachine();
   //Run through all files in the current directory
-  dp = opendir ("./");
-  if (dp != NULL)
-    {
-      while ((ep = readdir (dp))){
-	file = ep->d_name;
-	if(verbosePlus)
-	    std::cout << "Opening file: " << file << endl;
-	infile.open(file);
-	if(infile){
-	  lineCount = 1;
-	  currentTotal = 0;
-	  if(verbose)
-	    std::cout << "Opened file: " << file << endl;
-	  //Run through each line for the current file
-	  while (getline( infile, input )){
-	    //If the line contains the regular expression print it to screen
-	    if(verbosePlus)
-	      std::cout << "Checking file: " << file << " line: " << lineCount << endl;
-	    if(DFA.run(input)){
-	      std::cout << file << ":" << lineCount << ":" << input << std::endl;
-	      ++total;
-	      ++currentTotal;
-	    }
-	    ++lineCount;
-	  }
-	} else {
-	  std::cout << "WARNING: Unable to open " << file << " for reading. Unable to check for regex string." << endl;
-	}
-	infile.close();
-	if(verbose)
-	  std::cout << "Finished checking file: " << file << "\nFound " << currentTotal << " results in file: " << file << endl;
-      }
-      (void) closedir (dp);
+  if(file != ""){
+    if(verbosePlus)
+      std::cout << "Opening file: " << file << std::endl;
+    infile.open(file);
+    if(infile){
+      total = checkFile(file, &infile, &DFA, verbose, verbosePlus);
+      if(verbose)
+	std::cout << "Finished checking file: " << file << "\nFound " << total << " results in file: " << file << endl;
+    } else {
+      std::cout << "WARNING: Unable to open " << file << " for reading. Unable to check for regex string." << endl;
     }
-  else{
-    std::cerr << "Couldn't open the directory" << std::endl;
+  } else {
+    dp = opendir ("./");
+    if (dp != NULL)
+      {
+	while ((ep = readdir (dp))){
+	  file = ep->d_name;
+	  if(verbosePlus)
+	    std::cout << "Opening file: " << file << std::endl;
+	  infile.open(file);
+	  if(infile){
+	    if(verbose)
+	      std::cout << "Opened file: " << file << std::endl;
+	    currentTotal = checkFile(file, &infile, &DFA, verbose, verbosePlus);
+	    total += currentTotal;
+	  } else {
+	    std::cout << "WARNING: Unable to open " << file << " for reading. Unable to check for regex string." << endl;
+	  }
+	  infile.close();
+	  if(verbose)
+	    std::cout << "Finished checking file: " << file << "\nFound " << currentTotal << " results in file: " << file << endl;
+	}
+	(void) closedir (dp);
+      }
+    else{
+      std::cerr << "Couldn't open the directory" << std::endl;
+    }
   }
   //Final output for the regex_main
   std::cout << "Found " << total << " results for: " << reg << std::endl;
