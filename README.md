@@ -20,3 +20,10 @@ $ ./regex_main
 ls:
 $ ./ls_main
 
+For help
+
+regex:
+$ ./regex_main -h
+
+ls:
+$ ls_main -h
