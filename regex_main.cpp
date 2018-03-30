@@ -6,6 +6,16 @@
 //#include "expression.h"
 
 /*
+  Function: usege()
+  Arguments: None
+  Returns: None
+  Description: Gives syntax for regex_main
+*/
+void usage(){
+  std::cout << "Usage: regex_main [options] regularExpression" << std::endl;
+}
+
+/*
   Function: help()
   Arguments: None
   Returns: None
@@ -14,9 +24,11 @@
 void help(){
   std::cout << "This is the help menu for regex_main" << std::endl;
   std::cout << "To use: $./regex_main\n";
-  std::cout << "Usage: regex_main [options] [regular expression]" << std::endl;
+  usage();
   std::cout << "Options: -d = Directory" << std::endl;
   std::cout << "              - The next argument will set the new directory pointer" << std::endl;
+  std::cout << "         -e = Exact" << std::endl;
+  std::cout << "              - The entire line must match the regular expression exactly" << std::endl;
   std::cout << "         -f = File" << std::endl;
   std::cout << "              - The next argument will be the specific file to check" << std::endl;
   std::cout << "         -h = Help" << std::endl;
@@ -40,16 +52,6 @@ void help(){
   std::cout << "\t            (...): Capture Group to group sequences of characters/strings\n";
   std::cout << "\tNote: You can concatinate these characters/sequences by typing them next to each other in a string format\n";
   std::cout << std::endl;
-}
-
-/*
-  Function: usege()
-  Arguments: None
-  Returns: None
-  Description: Gives syntax for regex_main
-*/
-void usage(){
-  std::cout << "Usage: regex_main [options] [regular expression]" << std::endl;
 }
 
 /*
@@ -95,6 +97,7 @@ int main(int var_num, char** vars){
   std::string regex, file = "", reg, directory = "./";
   std::ifstream infile;
   int total = 0, currentTotal = 0;
+  bool exact = false;
   bool help_var = false;
   bool usage_var = false;
   bool verbose = false;
@@ -111,7 +114,9 @@ int main(int var_num, char** vars){
     } else if ((string)vars[i] == "-v+"){ //Verbose plus Mode
       verbose = true;
       verbosePlus = true;
-    } else if ((string)vars[i] == "-f"){
+    } else if ((string)vars[i] == "-e"){ //Exact
+      exact = true;
+    }else if ((string)vars[i] == "-f"){
       if(++i >= var_num){
 	std::cout << "Must provide a file after -f" << std::endl;;
       }
@@ -152,7 +157,11 @@ int main(int var_num, char** vars){
   //Start of regex section
 
   //Regex will search for sequences inside of lines so add .* so check inside the line
-  regex = ".*" + reg + ".*";
+  if(!exact){
+    regex = ".*" + reg + ".*";
+  } else {
+    regex = reg;
+  }
   
   //Create the DFA
   //Regular Expression -> NFA -> DFA
