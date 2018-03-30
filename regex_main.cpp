@@ -15,7 +15,9 @@ void help(){
   std::cout << "This is the help menu for regex_main" << std::endl;
   std::cout << "To use: $./regex_main\n";
   std::cout << "Usage: regex_main [options] [regular expression]" << std::endl;
-  std::cout << "Options: -f = File" << std::endl;
+  std::cout << "Options: -d = Directory" << std::endl;
+  std::cout << "              - The next argument will set the new directory pointer" << std::endl;
+  std::cout << "         -f = File" << std::endl;
   std::cout << "              - The next argument will be the specific file to check" << std::endl;
   std::cout << "         -h = Help" << std::endl;
   std::cout << "         -u = Usage" << std::endl;
@@ -50,6 +52,16 @@ void usage(){
   std::cout << "Usage: regex_main [options] [regular expression]" << std::endl;
 }
 
+/*
+  Function: checkFile()
+  Arguments: std::string file - file name
+             std::ifstream* infile - file ot get lines from
+             finiteMachine* DFA - DFA to test each line
+             bool verbose - to show detail
+             bool verbosePlus - to show extra detail
+  Returns: int - number of matching lines in file to DFA
+  Description: Runs threw a file seaching for a matching line to the regular expression
+*/
 int checkFile(std::string file, std::ifstream* infile, finiteMachine* DFA, bool verbose, bool verbosePlus){
   int lineCount = 1;
   int currentTotal = 0;
@@ -80,7 +92,7 @@ int main(int var_num, char** vars){
   //Variable declaration
   DIR *dp;
   struct dirent *ep;
-  std::string regex, file = "", reg;
+  std::string regex, file = "", reg, directory = "./";
   std::ifstream infile;
   int total = 0, currentTotal = 0;
   bool help_var = false;
@@ -104,6 +116,11 @@ int main(int var_num, char** vars){
 	std::cout << "Must provide a file after -f" << std::endl;;
       }
       file = (string)vars[i];
+    } else if ((string)vars[i] == "-d"){
+      if(++i >= var_num){
+	std::cout << "Must provide a directory after -d" << std::endl;;
+      }
+      directory = (string)vars[i];
     } else { //Must be regular expression
       if(reg.empty()){
 	reg = string(vars[i]);
@@ -139,7 +156,6 @@ int main(int var_num, char** vars){
   
   //Create the DFA
   //Regular Expression -> NFA -> DFA
-  //expression express(regex);
   finiteMachine NFA(regex);
   finiteMachine DFA = NFA.toDFA();
   if(verbosePlus)
@@ -157,7 +173,8 @@ int main(int var_num, char** vars){
       std::cout << "WARNING: Unable to open " << file << " for reading. Unable to check for regex string." << endl;
     }
   } else {
-    dp = opendir ("./");
+    const char *direct = directory.c_str();
+    dp = opendir (direct);
     if (dp != NULL)
       {
 	while ((ep = readdir (dp))){
