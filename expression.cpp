@@ -28,7 +28,6 @@ string expression::toNFA(string startState, vector<string>* states, map<string, 
     //must be a term
     return termToNFA(character, startState, states, transitionTable, alphabet);
   } else if(t_or){
-    //cout << "Checking type\n";
     return orToNFA(loe1, loe2, startState, states, transitionTable, alphabet);
   } else if(t_star) {
     return starToNFA(loe1, startState, states, transitionTable, alphabet);
@@ -86,7 +85,7 @@ string expression::orToNFA(vector<expression> loe1, vector<expression> loe2, str
   }
   //connect the second link to the end state
   transitionTable->operator[](currentState)[' '].push_back(endState);
-  
+  std::cout << "Num states - " << loe2.size() << " - " << loe1.size() << "\n";
   return endState;
 }
 

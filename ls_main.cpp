@@ -73,7 +73,7 @@ int main(int var_num, char** vars){
       usage_var = true;
     } else if ((string)vars[i] == "-v"){ //Verbose Mode
       verbose = true;
-    }  else if ((string)vars[i] == "-v+"){ //Verbose plus Mode
+    } else if ((string)vars[i] == "-v+"){ //Verbose plus Mode
       verbose = true;
       verbosePlus = true;
     } else { //Must be regular expression
@@ -110,6 +110,7 @@ int main(int var_num, char** vars){
   finiteMachine NFA(reg);
   finiteMachine DFA = NFA.toDFA();
 
+  
   if(verbosePlus)
     DFA.printMachine();
 

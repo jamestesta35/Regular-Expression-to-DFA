@@ -158,7 +158,7 @@ int main(int var_num, char** vars){
 
   //Regex will search for sequences inside of lines so add .* so check inside the line
   if(!exact){
-    regex = ".*" + reg + ".*";
+    regex = ".*(" + reg + ").*";
   } else {
     regex = reg;
   }
@@ -167,6 +167,7 @@ int main(int var_num, char** vars){
   //Regular Expression -> NFA -> DFA
   finiteMachine NFA(regex);
   finiteMachine DFA = NFA.toDFA();
+  DFA.printMachine();
   if(verbosePlus)
     DFA.printMachine();
   //Run through all files in the current directory
