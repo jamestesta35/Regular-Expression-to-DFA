@@ -167,7 +167,7 @@ int main(int var_num, char** vars){
   //Regular Expression -> NFA -> DFA
   finiteMachine NFA(regex);
   finiteMachine DFA = NFA.toDFA();
-  DFA.printMachine();
+  
   if(verbosePlus)
     DFA.printMachine();
   //Run through all files in the current directory

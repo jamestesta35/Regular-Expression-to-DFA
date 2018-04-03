@@ -85,7 +85,7 @@ string expression::orToNFA(vector<expression> loe1, vector<expression> loe2, str
   }
   //connect the second link to the end state
   transitionTable->operator[](currentState)[' '].push_back(endState);
-  std::cout << "Num states - " << loe2.size() << " - " << loe1.size() << "\n";
+  
   return endState;
 }
 
