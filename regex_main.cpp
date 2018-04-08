@@ -37,6 +37,10 @@ void help(){
   std::cout << "              - Adds: Opening File, Finished Checking File" << std::endl;
   std::cout << "         -v+ = Verbose Plus Mode" << std::endl;
   std::cout << "              - Adds: All Verbose Mode functionality, Print DFA Used, Opening File, Checing Line" << std::endl;
+  std::cout << "         -dfa = Print DFA" << std::endl;
+  std::cout << "              - The next argument will be the specific file to print the DFA used for the regular expression" << std::endl;
+  std::cout << "         -nfa = Print NFA" << std::endl;
+  std::cout << "              - The next argument will be the specific file to print the NFA used for the regular expression" << std::endl;
   std::cout << "Regular Expression:" << std::endl;
   std::cout << "\tCharacters: ascii characters 'space' -> '~'\n";
   std::cout << "\t            \\d: One digit from 0-9\n";
@@ -94,7 +98,7 @@ int main(int var_num, char** vars){
   //Variable declaration
   DIR *dp;
   struct dirent *ep;
-  std::string regex, file = "", reg, directory = "./";
+  std::string regex, file = "", reg, directory = "./", print_dfa = "", print_nfa = "";
   std::ifstream infile;
   int total = 0, currentTotal = 0;
   bool exact = false;
@@ -116,6 +120,16 @@ int main(int var_num, char** vars){
       verbosePlus = true;
     } else if ((string)vars[i] == "-e"){ //Exact
       exact = true;
+    } else if ((string)vars[i] == "-nfa"){ //Print NFA
+      if(++i >= var_num){
+	std::cout << "Must provide a file after -nfa" << std::endl;;
+      }
+      print_nfa = (string)vars[i];
+    } else if ((string)vars[i] == "-dfa"){ //Print DFA
+      if(++i >= var_num){
+	std::cout << "Must provide a file after -dfa" << std::endl;;
+      }
+      print_dfa = (string)vars[i];
     }else if ((string)vars[i] == "-f"){
       if(++i >= var_num){
 	std::cout << "Must provide a file after -f" << std::endl;;
@@ -166,7 +180,13 @@ int main(int var_num, char** vars){
   //Create the DFA
   //Regular Expression -> NFA -> DFA
   finiteMachine NFA(regex);
+  if(print_nfa != ""){
+    NFA.printJson(print_nfa);
+  }
   finiteMachine DFA = NFA.toDFA();
+  if(print_dfa != ""){
+    NFA.printJson(print_dfa);
+  }
   
   if(verbosePlus)
     DFA.printMachine();

@@ -37,6 +37,7 @@ class finiteMachine{
   bool hasAcceptState(vector<string> strings);
   string findStateName(vector<string> strings);
   void printMachine();
+  void printJson(string file);
   
 };
 

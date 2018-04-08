@@ -269,3 +269,34 @@ void finiteMachine::printMachine(){
     cout << "Alphabet -> "<< alphabet_[i] << endl;
   }
 }
+
+void finiteMachine::printJson(string file){
+  cout << "{\n\t";
+  if(isDFA){
+    cout << "\"dfa\": {\n\t\t";
+  } else {
+    cout << "\"nfa\": {\n\t\t";
+  }
+  cout << "\"states\": {\n\t\t\t";
+  cout << "\"state\": [\n";
+  for(int i = 0; i < states_.size(); ++i){
+    cout << "\t\t\t\t{\n\t\t\t\t\t\"name\": \"";
+    cout << states_[i];
+    cout << "\"\n\t\t\t\t}";
+    if(i != states_.size()){
+      cout << ",";
+    }
+    cout << "\n";
+  }
+  cout << "\t\t\t]\n\t\t},\n\t\t\"alphabet\": {\n";
+  cout << "\t\t\t\"input\": [\n";
+  for(int i = 0; i < alphabet_.size(); ++i){
+    cout << "\t\t\t\t{\n\t\t\t\t\t\"char\": \"";
+    cout << alphabet_[i];
+    cout << "\"\n\t\t\t\t}";
+    if(i != alphabet_.size()){
+      cout << ",";
+    }
+    cout << "\n";
+  }
+}
