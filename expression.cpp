@@ -258,7 +258,7 @@ string expression::termToNFA(string character, string startState, vector<string>
 expression expression::parse_ex(string reg){
   expression ex, second;
   string substring = "";
-  for(int i = 0; i < reg.size(); ++i){
+  for(unsigned i = 0; i < reg.size(); ++i){
     expression sub;
     switch(reg[i]){
     case '[':
@@ -276,14 +276,14 @@ expression expression::parse_ex(string reg){
       break;
     case '|':
       sub.t_or = true;
-      for(int j = 0; j < ex.loe1.size(); ++j){
+      for(unsigned j = 0; j < ex.loe1.size(); ++j){
 	sub.loe1.push_back(ex.loe1[j]);
       }
       while(ex.loe1.size() > 0){
 	ex.loe1.pop_back();
       }
       second = parse_ex(reg.substr(++i));
-      for(int j = 0; j < second.loe1.size(); ++j){
+      for(unsigned j = 0; j < second.loe1.size(); ++j){
 	sub.loe2.push_back(second.loe1[j]);
       }
       i = reg.size();
