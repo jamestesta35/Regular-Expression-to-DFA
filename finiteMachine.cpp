@@ -86,7 +86,7 @@ finiteMachine finiteMachine::toDFA(){
   
   newStartState = findStateName(currentStates);
   //cout << "Adding new State: " << newStartState << "\n";
-  for(int i = 0; i < acceptStates_.size(); ++i){
+  for(unsigned i = 0; i < acceptStates_.size(); ++i){
     if(find(currentStates.begin(), currentStates.end(), acceptStates_[i]) != currentStates.end()){
       newAcceptStates.push_back(newStartState);
       i = acceptStates_.size();
@@ -227,7 +227,7 @@ vector<string> finiteMachine::findEmptyStateList(string state, vector<string> se
 string finiteMachine::findStateName(vector<string> strings){
   string name = "";
   sort(strings.begin(), strings.end());
-  for(int l = 0; l < strings.size(); ++l){
+  for(unsigned l = 0; l < strings.size(); ++l){
     name += strings[l];
     if(l != strings.size()-1){
       name += ",";
