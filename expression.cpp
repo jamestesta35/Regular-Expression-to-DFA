@@ -33,7 +33,7 @@ string expression::toNFA(string startState, vector<string>* states, map<string, 
     return starToNFA(loe1, startState, states, transitionTable, alphabet);
   } else {
     string currentState = startState;
-    for(int i = 0; i < loe1.size(); ++i){
+    for(unsigned i = 0; i < loe1.size(); ++i){
       currentState = loe1[i].toNFA(currentState, states, transitionTable, alphabet);
     }
     return currentState;
@@ -48,7 +48,7 @@ string expression::starToNFA(vector<expression> loe1, string startState, vector<
   transitionTable->operator[](startState)[' '].push_back(state1);
   //Loop though list so we can loop thougb mutliple times
   string currentState = state1;
-  for(int i = 0; i < loe1.size(); ++i){
+  for(unsigned i = 0; i < loe1.size(); ++i){
     currentState = loe1[i].toNFA(currentState, states, transitionTable, alphabet);
   }
   //Create a state for simplicity
@@ -71,7 +71,7 @@ string expression::orToNFA(vector<expression> loe1, vector<expression> loe2, str
   string endState = "q" + to_string(states->size());
   states->push_back(endState);
   //create a link of states from loe1
-  for(int i = 0; i < loe1.size(); ++i){
+  for(unsigned i = 0; i < loe1.size(); ++i){
     currentState = loe1[i].toNFA(currentState, states, transitionTable, alphabet);
   }
   //link the list of states to the end state
@@ -80,7 +80,7 @@ string expression::orToNFA(vector<expression> loe1, vector<expression> loe2, str
   //start back at the begining
   currentState = startState;
   //create the second link of states
-  for(int i = 0; i < loe2.size(); ++i){
+  for(unsigned i = 0; i < loe2.size(); ++i){
     currentState = loe2[i].toNFA(currentState, states, transitionTable, alphabet);
   }
   //connect the second link to the end state
@@ -121,7 +121,7 @@ string expression::termToNFA(string character, string startState, vector<string>
 	  }
 	}
       } else {
-	for(int i = 1; i < character.size()-1; ++i){
+	for(unsigned i = 1; i < character.size()-1; ++i){
 	  transitionTable->operator[](startState)[character[i]].push_back(newState);
 	  if(find(alphabet->begin(), alphabet->end(), character[i]) == alphabet->end()){
 	    alphabet->push_back(character[i]);
