@@ -43,7 +43,7 @@ finiteMachine::finiteMachine(expression ex){
 bool run2(string input, map<string,map<char,vector<string> > > transitionTable, string startState, vector<string> acceptStates, vector<char>alphabet){
   string state = startState;
   vector<string> states;
-  for(int i = 0; i < input.size(); ++i){
+  for(unsigned i = 0; i < input.size(); ++i){
     if(find(alphabet.begin(), alphabet.end(), input[i]) == alphabet.end()){
       return false;
     }
@@ -93,7 +93,7 @@ finiteMachine finiteMachine::toDFA(){
     }
   }
   
-  for(int i = 0; i < newStates_vec.size(); ++i){
+  for(unsigned i = 0; i < newStates_vec.size(); ++i){
     //Check to see if it already exists as a state
     currentStates = newStates_vec[i];
     string currentName = findStateName(currentStates);
@@ -101,18 +101,18 @@ finiteMachine finiteMachine::toDFA(){
       //We have a new state and need to find all the possible routs
       newStates.push_back(currentName);
       //Start with the first letter 
-      for(int j = 0; j < alphabet_.size(); ++j){
+      for(unsigned j = 0; j < alphabet_.size(); ++j){
 	char currentAlphabet = alphabet_[j];
 	vector<string> outcomes;
 	//Then take each of the states it could be in
-	for(int k = 0; k < currentStates.size(); ++k){
+	for(unsigned k = 0; k < currentStates.size(); ++k){
 	  //Then add to a list all of the possible states you could end up next
 	  vector<string> newOutcomes = findTransitions(currentStates[k], currentAlphabet);
 	  //Use the empty transition state for those to find the new states
-	  for(int l = 0; l < newOutcomes.size(); ++l){
+	  for(unsigned l = 0; l < newOutcomes.size(); ++l){
 	    vector<string> temp_;
 	    vector<string> newOutcomesEmpty = findEmptyStateList(newOutcomes[l], temp_);
-	    for(int m = 0; m < newOutcomesEmpty.size(); ++m){
+	    for(unsigned m = 0; m < newOutcomesEmpty.size(); ++m){
 	      if(find(outcomes.begin(), outcomes.end(), newOutcomesEmpty[m]) == outcomes.end()){
 		outcomes.push_back(newOutcomesEmpty[m]);
 	      }
@@ -156,7 +156,7 @@ bool finiteMachine::run_sub(string currentState, string input){
     } else {
       bool results = false;
       string newString = input.erase(0,1);
-      for (int i = 0; i < transitions.size(); ++i){
+      for (unsigned i = 0; i < transitions.size(); ++i){
 	vector<string> epsilons;
 	string newState = transitions[i];
 	results = results | run_eps(newState, newString, epsilons);
@@ -168,7 +168,7 @@ bool finiteMachine::run_sub(string currentState, string input){
 
 bool finiteMachine::run_eps(string currentState, string input, vector<string> epsilons){
   //std::cout << "In eps in " << currentState << " State:" << input << "\n";
-  for (int i = 0; i < epsilons.size(); ++i){
+  for (unsigned i = 0; i < epsilons.size(); ++i){
     if (epsilons[i] == currentState){
       // We must have already been at this state so we must have a loop
       return false;
@@ -178,7 +178,7 @@ bool finiteMachine::run_eps(string currentState, string input, vector<string> ep
   epsilons.push_back(currentState);
   bool results = false;
   vector<string> transitions = findTransitions(currentState, ' ');
-  for (int i = 0; i < transitions.size(); ++i){
+  for (unsigned i = 0; i < transitions.size(); ++i){
     //This must be an epsilon state so we want to add it to the list and then 
     // check that one for susiquent epsilons
     string nexState = transitions[i];
@@ -191,7 +191,7 @@ bool finiteMachine::run_eps(string currentState, string input, vector<string> ep
 }
 
 bool finiteMachine::isAcceptState(string state){
-  for (int i = 0; i < acceptStates_.size(); ++i){
+  for (unsigned i = 0; i < acceptStates_.size(); ++i){
     if (acceptStates_[i] == state){
       return true;
     }
@@ -213,9 +213,9 @@ vector<string> finiteMachine::findEmptyStateList(string state, vector<string> se
   }
   vector<string> emptyTransitions = transitionTable_[state][' '];
   seenStates.push_back(state);
-  for(int i = 0; i < emptyTransitions.size(); ++i){
+  for(unsigned i = 0; i < emptyTransitions.size(); ++i){
     vector<string> returnedStates = findEmptyStateList(emptyTransitions[i], seenStates);
-    for(int j = 0; j < returnedStates.size(); ++j){
+    for(unsigned j = 0; j < returnedStates.size(); ++j){
       if(find(seenStates.begin(), seenStates.end(), returnedStates[j]) == seenStates.end()){
 	seenStates.push_back(returnedStates[j]);
       }
@@ -238,7 +238,7 @@ string finiteMachine::findStateName(vector<string> strings){
 
 bool finiteMachine::hasAcceptState(vector<string> strings){
   bool accept = false;
-  for(int l = 0; l < strings.size(); ++l){
+  for(unsigned l = 0; l < strings.size(); ++l){
     if(find(acceptStates_.begin(), acceptStates_.end(), strings[l]) != acceptStates_.end()){
       accept = true;
     }
@@ -247,7 +247,7 @@ bool finiteMachine::hasAcceptState(vector<string> strings){
 }
 
 void finiteMachine::printMachine(){
-  for(int i = 0; i < states_.size(); ++i){
+  for(unsigned i = 0; i < states_.size(); ++i){
     map<char, vector <string > > tempMap = transitionTable_[states_[i]];
     for(int j = 0; j < 127; ++j){
       vector<string> nextState = tempMap[char(j)];
@@ -258,14 +258,14 @@ void finiteMachine::printMachine(){
       }
     }
   }
-  for(int i = 0; i < states_.size(); ++i){
+  for(unsigned i = 0; i < states_.size(); ++i){
     cout << "State-> "<< states_[i] << endl;
   }
-  for(int i = 0; i < acceptStates_.size(); ++i){
+  for(unsigned i = 0; i < acceptStates_.size(); ++i){
     cout << "End States-> "<< acceptStates_[i] << endl;
   }
   cout << "StartState = " << startState_ << "\n";
-  for(int i = 0; i < alphabet_.size(); ++i){
+  for(unsigned i = 0; i < alphabet_.size(); ++i){
     cout << "Alphabet -> "<< alphabet_[i] << endl;
   }
 }
@@ -279,7 +279,7 @@ void finiteMachine::printJson(string file){
   }
   cout << "\"states\": {\n\t\t\t";
   cout << "\"state\": [\n";
-  for(int i = 0; i < states_.size(); ++i){
+  for(unsigned i = 0; i < states_.size(); ++i){
     cout << "\t\t\t\t{\n\t\t\t\t\t\"name\": \"";
     cout << states_[i];
     cout << "\"\n\t\t\t\t}";
@@ -290,7 +290,7 @@ void finiteMachine::printJson(string file){
   }
   cout << "\t\t\t]\n\t\t},\n\t\t\"alphabet\": {\n";
   cout << "\t\t\t\"input\": [\n";
-  for(int i = 0; i < alphabet_.size(); ++i){
+  for(unsigned i = 0; i < alphabet_.size(); ++i){
     cout << "\t\t\t\t{\n\t\t\t\t\t\"char\": \"";
     cout << alphabet_[i];
     cout << "\"\n\t\t\t\t}";
