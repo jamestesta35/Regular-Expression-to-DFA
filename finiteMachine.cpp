@@ -252,7 +252,7 @@ void finiteMachine::printMachine(){
     for(int j = 0; j < 127; ++j){
       vector<string> nextState = tempMap[char(j)];
       if(!nextState.empty()){
-	for(int k = 0 ; k < nextState.size(); ++k){
+	for(unsigned k = 0 ; k < nextState.size(); ++k){
 	  cout << "Transition-> " << states_[i] << " " << char(j) << " " << nextState[k] << endl;
 	}
       }
