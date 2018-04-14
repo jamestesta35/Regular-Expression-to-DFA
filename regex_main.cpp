@@ -181,11 +181,17 @@ int main(int var_num, char** vars){
   //Regular Expression -> NFA -> DFA
   finiteMachine NFA(regex);
   if(print_nfa != ""){
-    NFA.printJson(print_nfa);
+    if(NFA.printJson(print_nfa)){
+      cout << "Unable to print NFA to file.\n";
+      return 10;
+    }
   }
   finiteMachine DFA = NFA.toDFA();
   if(print_dfa != ""){
-    NFA.printJson(print_dfa);
+    if(DFA.printJson(print_dfa)){
+      cout << "Unable to print DFA to file.\n";
+      return 11;
+    }
   }
   
   if(verbosePlus)

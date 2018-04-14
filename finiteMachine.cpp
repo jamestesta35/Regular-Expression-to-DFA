@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <string>
@@ -270,33 +271,84 @@ void finiteMachine::printMachine(){
   }
 }
 
-void finiteMachine::printJson(string file){
-  cout << "{\n\t";
+bool finiteMachine::printJson(string file){
+  std::ofstream outfile;
+  outfile.open(file);
+  if(!outfile.is_open()){
+    return true;
+  }
+  outfile << "{\n  ";
   if(isDFA){
-    cout << "\"dfa\": {\n\t\t";
+    outfile << "\"dfa\": {\n    ";
   } else {
-    cout << "\"nfa\": {\n\t\t";
+    outfile << "\"nfa\": {\n    ";
   }
-  cout << "\"states\": {\n\t\t\t";
-  cout << "\"state\": [\n";
+  outfile << "\"states\": {\n      ";
+  outfile << "\"state\": [\n";
   for(unsigned i = 0; i < states_.size(); ++i){
-    cout << "\t\t\t\t{\n\t\t\t\t\t\"name\": \"";
-    cout << states_[i];
-    cout << "\"\n\t\t\t\t}";
+    outfile << "        {\n          \"name\": \"";
+    outfile << states_[i];
+    outfile << "\"\n        }";
     if(i != states_.size()){
-      cout << ",";
+      outfile << ",";
     }
-    cout << "\n";
+    outfile << "\n";
   }
-  cout << "\t\t\t]\n\t\t},\n\t\t\"alphabet\": {\n";
-  cout << "\t\t\t\"input\": [\n";
+  outfile << "      ]\n    },\n    \"alphabet\": {\n";
+  outfile << "      \"input\": [\n";
   for(unsigned i = 0; i < alphabet_.size(); ++i){
-    cout << "\t\t\t\t{\n\t\t\t\t\t\"char\": \"";
-    cout << alphabet_[i];
-    cout << "\"\n\t\t\t\t}";
+    outfile << "        {\n          \"char\": \"";
+    outfile << alphabet_[i];
+    outfile << "\"\n        }";
     if(i != alphabet_.size()){
-      cout << ",";
+      outfile << ",";
     }
-    cout << "\n";
+    outfile << "\n";
   }
+  outfile << "      ]\n    },\n";
+  outfile << "    \"startstate\": \"";
+  outfile << startState_;
+  outfile << "\",\n";
+
+  outfile << "    \"finalstates\": {\n";
+  outfile << "      \"state\": [\n";
+  for(unsigned i = 0; i < acceptStates_.size(); ++i){
+    outfile << "        {\n          \"name\": \"";
+    outfile << acceptStates_[i];
+    outfile << "\"\n        }";
+    if(i != acceptStates_.size()){
+      outfile << ",";
+    }
+    outfile << "\n";
+  }
+  outfile << "      ]\n    },\n    \"transitions\": {\n";
+  outfile << "      \"transition\": [\n";
+  int totalTransitions = 0;
+  for(map<string,map<char,vector<string> > >::iterator it=transitionTable_.begin(); it!=transitionTable_.end(); ++it){
+    for(map<char,vector<string> >::iterator itt=it->second.begin(); itt!=it->second.end(); ++itt){
+      for(unsigned i = 0; i < itt->second.size(); ++i)
+	++totalTransitions;
+    }
+  }
+  for(map<string,map<char,vector<string> > >::iterator it=transitionTable_.begin(); it!=transitionTable_.end(); ++it){
+    for(map<char,vector<string> >::iterator itt=it->second.begin(); itt!=it->second.end(); ++itt){
+      for(unsigned i = 0; i < itt->second.size(); ++i){
+	outfile << "        {\n";
+	outfile << "          \"currentState\": \"" << it->first << "\",\n";
+	outfile << "          \"input\": \"" << itt->first << "\",\n";
+	outfile << "          \"newstate\": \"" << itt->second[i] << "\",\n";
+	outfile << "        }";
+	if(--totalTransitions != 0){
+	  outfile << ",";
+	}
+	outfile << "\n";
+      }
+    }
+  }
+  outfile << "      }\n";
+  outfile << "    }\n";
+  outfile << "  }\n";
+  outfile << "}\n";
+  outfile.close();
+  return false;
 }
