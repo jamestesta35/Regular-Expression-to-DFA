@@ -44,17 +44,23 @@ finiteMachine::finiteMachine(expression ex){
 bool run2(string input, map<string,map<char,vector<string> > > transitionTable, string startState, vector<string> acceptStates, vector<char>alphabet){
   string state = startState;
   vector<string> states;
+  //cout << "Input - " << input << "\n";
   for(unsigned i = 0; i < input.size(); ++i){
     if(find(alphabet.begin(), alphabet.end(), input[i]) == alphabet.end()){
+      //cout << "Not in Alphabet\n";
       return false;
     }
     states = transitionTable[state][input[i]];
     if(states.size() == 0){
+      //cout << "Not in Transition Table\n";
+      //cout << "State - " << state << "\n";
+      //cout << "Input - " << input[i] << "\n";
       return false;
     }
     state = states[0];
   }
   if(find(acceptStates.begin(), acceptStates.end(), state) == acceptStates.end()){
+    //cout << "Not an accept state\n";
     return false;
   }
   return true;
@@ -71,7 +77,7 @@ bool finiteMachine::run(string input){
 
 
 
-finiteMachine finiteMachine::toDFA(){ 
+finiteMachine finiteMachine::toDFA(){
   // We already have the transition table
   map<string,map<char,vector<string> > > newTransitionTable;
   vector<string> newStates;
@@ -289,7 +295,7 @@ bool finiteMachine::printJson(string file){
     outfile << "        {\n          \"name\": \"";
     outfile << states_[i];
     outfile << "\"\n        }";
-    if(i != states_.size()){
+    if(i != states_.size()-1){
       outfile << ",";
     }
     outfile << "\n";
@@ -300,7 +306,7 @@ bool finiteMachine::printJson(string file){
     outfile << "        {\n          \"char\": \"";
     outfile << alphabet_[i];
     outfile << "\"\n        }";
-    if(i != alphabet_.size()){
+    if(i != alphabet_.size()-1){
       outfile << ",";
     }
     outfile << "\n";
@@ -316,7 +322,7 @@ bool finiteMachine::printJson(string file){
     outfile << "        {\n          \"name\": \"";
     outfile << acceptStates_[i];
     outfile << "\"\n        }";
-    if(i != acceptStates_.size()){
+    if(i != acceptStates_.size()-1){
       outfile << ",";
     }
     outfile << "\n";
@@ -336,7 +342,7 @@ bool finiteMachine::printJson(string file){
 	outfile << "        {\n";
 	outfile << "          \"currentState\": \"" << it->first << "\",\n";
 	outfile << "          \"input\": \"" << itt->first << "\",\n";
-	outfile << "          \"newstate\": \"" << itt->second[i] << "\",\n";
+	outfile << "          \"newstate\": \"" << itt->second[i] << "\"\n";
 	outfile << "        }";
 	if(--totalTransitions != 0){
 	  outfile << ",";
@@ -345,10 +351,215 @@ bool finiteMachine::printJson(string file){
       }
     }
   }
-  outfile << "      }\n";
+  outfile << "      ]\n";
   outfile << "    }\n";
   outfile << "  }\n";
   outfile << "}\n";
   outfile.close();
+  return false;
+}
+bool finiteMachine::loadJson(string file){
+  std::ifstream infile;
+  string input;
+  vector<string> states;
+  string start;
+  vector<char> alphabet;
+  map<string,map<char,vector<string> > > transitions;
+  string now;
+  string next;
+  char input_c;
+  vector<string> finalstates;
+  
+  isDFA = false;
+  infile.open(file);
+  if(!infile.is_open()){
+    return true;
+  }
+  infile >> input;
+  if(input != "{") {return true;}
+  infile >> input;
+  //cout << input << "\n";
+  if(input == "\"dfa\":") {isDFA = true;}
+  infile >> input;
+  if(input != "{") {return true;}
+  infile >> input;
+  while(input != "}"){
+    if(input == "\"states\":"){
+      infile >> input;
+      if(input != "{") {return true;}
+      infile >> input;
+      if(input != "\"state\":") {return true;}
+      infile >> input;
+      if(input != "[") {return true;}
+      infile >> input;
+      while(input != "]"){
+	if(input != "{") {return true;}
+	infile >> input;
+	if(input != "\"name\":") {return true;}
+	infile >> input;
+	if(input.size() > 1)
+	  input = input.substr(1, input.size() - 2);
+	if(input.size() > 0){
+	  states.push_back(input);
+	  //std::cout << input << "\n";
+	}
+	infile >> input;
+	if(input[0] != '}') {return true;}
+	infile >> input;
+      }
+    }
+    else if(input == "\"alphabet\":"){
+      infile >> input;
+      if(input != "{") {return true;}
+      infile >> input;
+      if(input != "\"input\":") {return true;}
+      infile >> input;
+      if(input != "[") {return true;}
+      infile >> input;
+      while(input != "]"){
+	if(input != "{") {return true;}
+	infile >> input;
+	if(input != "\"char\":") {return true;}
+	infile >> input;
+	if(input.size() > 1){
+	  input = input.substr(1, input.size() - 2);
+	  if(input.size() == 1){
+	    alphabet.push_back(input[0]);
+	    //std::cout << input << "\n";
+	  } else {
+	    return true;
+	  }
+	} else {
+	  if(input == "\""){
+	    infile >> input;
+	    if(input == "\""){
+	      alphabet.push_back(' ');
+	      //std::cout << " " << "\n";
+	    } else {
+	      return true;
+	    }
+	  } else {
+	    return true;
+	  }
+	}
+	infile >> input;
+	if(input[0] != '}') {return true;}
+	infile >> input;
+      }
+    }
+    else if(input == "\"finalstates\":"){
+      infile >> input;
+      if(input != "{") {return true;}
+      infile >> input;
+      if(input != "\"state\":") {return true;}
+      infile >> input;
+      if(input != "[") {return true;}
+      infile >> input;
+      while(input != "]"){
+	if(input != "{") {return true;}
+	infile >> input;
+	if(input != "\"name\":") {return true;}
+	infile >> input;
+	if(input.size() > 1)
+	  input = input.substr(1, input.size() - 2);
+	if(input.size() > 0){
+	  finalstates.push_back(input);
+	  //std::cout << input << "\n";
+	}
+	infile >> input;
+	if(input[0] != '}') {return true;}
+	infile >> input;
+      }
+    }
+    else if(input == "\"transitions\":"){
+      infile >> input;
+      if(input != "{") {return true;}
+      infile >> input;
+      if(input != "\"transition\":") {return true;}
+      infile >> input;
+      if(input != "[") {return true;}
+      infile >> input;
+      while(input != "]"){
+	if(input != "{") {return true;}
+	infile >> input;
+	if(input != "\"currentState\":") {return true;}
+	infile >> input;
+	if(input.size() > 1)
+	  input = input.substr(1, input.size() - 3);
+	if(input.size() > 0){
+	  now = input;
+	  //std::cout << now << "\n";
+	}
+	infile >> input;
+	if(input != "\"input\":") {return true;}
+	infile >> input;
+	if(input.size() > 1){
+	  input = input.substr(1, input.size() - 3);
+	  if(input.size() == 1){
+	    input_c = input[0];
+	    //std::cout << input_c << "\n";
+	  }
+	} else {
+	  if(input == "\""){
+	    infile >> input;
+	    //cout << "input - " << input << "\n";
+	    if(input == "\","){
+	      input_c = ' ';
+	      //std::cout << " " << "\n";
+	    } else {
+	      return true;
+	    }
+	  } else {
+	    return true;
+	  }
+	}
+	infile >> input;
+	if(input != "\"newstate\":") {return true;}
+	infile >> input;
+	if(input.size() > 1)
+	  input = input.substr(1, input.size() - 2);
+	if(input.size() > 0){
+	  next = input;
+	  //std::cout << next << "\n";
+	}
+	transitions[now][input_c].push_back(next);
+	//cout << "This - " << transitions[now][input_c][0] << "\n";
+	infile >> input;
+	if(input[0] != '}') {return true;}
+	infile >> input;
+      }
+    }
+    else if(input == "\"startstate\":"){
+      infile >> input;
+      if(input.size() > 1){
+	  input = input.substr(1, input.size() - 3);
+	if(input.size() > 0){
+	  start = input;
+	  //cout << "Start - " << start << "\n";
+	} else {
+	  return true;
+	}
+      } else {
+	return true;
+      }
+    }
+    
+    infile >> input;
+  }
+  
+  infile >> input;
+  if(input != "}") {return true;}
+  infile >> input;
+  if(input != "}") {return true;}
+
+  infile.close();
+  //cout << "SIZE - " << transitions.size() << "\n";
+  //cout << "SIZE - " << transitionTable_.size() << "\n";
+  states_ = states;
+  alphabet_ = alphabet;
+  transitionTable_ = transitions;
+  startState_ = start;
+  acceptStates_ = finalstates;
+
   return false;
 }

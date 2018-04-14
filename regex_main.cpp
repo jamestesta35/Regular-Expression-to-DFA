@@ -98,7 +98,7 @@ int main(int var_num, char** vars){
   //Variable declaration
   DIR *dp;
   struct dirent *ep;
-  std::string regex, file = "", reg, directory = "./", print_dfa = "", print_nfa = "";
+  std::string regex, file = "", reg, directory = "./", print_dfa = "", print_nfa = "", load = "";
   std::ifstream infile;
   int total = 0, currentTotal = 0;
   bool exact = false;
@@ -130,6 +130,11 @@ int main(int var_num, char** vars){
 	std::cout << "Must provide a file after -dfa" << std::endl;;
       }
       print_dfa = (string)vars[i];
+    }else if ((string)vars[i] == "-l"){ //load json
+      if(++i >= var_num){
+	std::cout << "Must provide a file after -l" << std::endl;;
+      }
+      load = (string)vars[i];
     }else if ((string)vars[i] == "-f"){
       if(++i >= var_num){
 	std::cout << "Must provide a file after -f" << std::endl;;
@@ -163,7 +168,7 @@ int main(int var_num, char** vars){
     return 1;
   }
   //End if 
-  if(reg.empty()){
+  if(reg.empty() && load == ""){
     std::cout << "Expected a regular expression" << std::endl;
     return 3;
   }
@@ -171,7 +176,7 @@ int main(int var_num, char** vars){
   //Start of regex section
 
   //Regex will search for sequences inside of lines so add .* so check inside the line
-  if(!exact){
+  if(!exact && load == ""){
     regex = ".*(" + reg + ").*";
   } else {
     regex = reg;
@@ -179,13 +184,24 @@ int main(int var_num, char** vars){
   
   //Create the DFA
   //Regular Expression -> NFA -> DFA
-  finiteMachine NFA(regex);
+  finiteMachine NFA;
+  if(load != ""){
+    if(NFA.loadJson(load)){
+      cout << "Unable to load Json finite machine from file.\n";
+      return 12;
+    } else {
+      //cout << "LOADED FROM FILE\n";
+    }
+  } else {
+    NFA = finiteMachine(regex);
+  }
   if(print_nfa != ""){
     if(NFA.printJson(print_nfa)){
       cout << "Unable to print NFA to file.\n";
       return 10;
     }
   }
+  
   finiteMachine DFA = NFA.toDFA();
   if(print_dfa != ""){
     if(DFA.printJson(print_dfa)){
@@ -193,7 +209,7 @@ int main(int var_num, char** vars){
       return 11;
     }
   }
-  
+    
   if(verbosePlus)
     DFA.printMachine();
   //Run through all files in the current directory
@@ -237,7 +253,11 @@ int main(int var_num, char** vars){
     }
   }
   //Final output for the regex_main
-  std::cout << "Found " << total << " results for: " << reg << std::endl;
+  if(load == ""){
+    std::cout << "Found " << total << " results for: " << reg << std::endl;
+  } else {
+    std::cout << "Found " << total << " results for loaded finite machine " << std::endl;
+  }
   
   return 0;
 }

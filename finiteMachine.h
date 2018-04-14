@@ -38,7 +38,8 @@ class finiteMachine{
   string findStateName(vector<string> strings);
   void printMachine();
   bool printJson(string file);
-  
+  bool loadJson(string file);
+   
 };
 
 #endif // FINITEMACHINE_H
