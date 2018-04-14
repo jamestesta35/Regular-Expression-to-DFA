@@ -184,7 +184,7 @@ bool finiteMachine::run_eps(string currentState, string input, vector<string> ep
   //std::cout << "I have not already been here\n";
   epsilons.push_back(currentState);
   bool results = false;
-  vector<string> transitions = findTransitions(currentState, ' ');
+  vector<string> transitions = findTransitions(currentState, 1);
   for (unsigned i = 0; i < transitions.size(); ++i){
     //This must be an epsilon state so we want to add it to the list and then 
     // check that one for susiquent epsilons
@@ -218,7 +218,7 @@ vector<string> finiteMachine::findEmptyStateList(string state, vector<string> se
   if(find(seenStates.begin(), seenStates.end(), state) != seenStates.end()){
     return seenStates;
   }
-  vector<string> emptyTransitions = transitionTable_[state][' '];
+  vector<string> emptyTransitions = transitionTable_[state][1];
   seenStates.push_back(state);
   for(unsigned i = 0; i < emptyTransitions.size(); ++i){
     vector<string> returnedStates = findEmptyStateList(emptyTransitions[i], seenStates);
@@ -341,7 +341,10 @@ bool finiteMachine::printJson(string file){
       for(unsigned i = 0; i < itt->second.size(); ++i){
 	outfile << "        {\n";
 	outfile << "          \"currentState\": \"" << it->first << "\",\n";
-	outfile << "          \"input\": \"" << itt->first << "\",\n";
+	if(itt->first == 1)
+	  outfile << "          \"input\": \"" << "xx" << "\",\n";
+	else
+	  outfile << "          \"input\": \"" << itt->first << "\",\n";
 	outfile << "          \"newstate\": \"" << itt->second[i] << "\"\n";
 	outfile << "        }";
 	if(--totalTransitions != 0){
@@ -498,6 +501,10 @@ bool finiteMachine::loadJson(string file){
 	  if(input.size() == 1){
 	    input_c = input[0];
 	    //std::cout << input_c << "\n";
+	  } else if(input == "xx"){
+	    input_c = 1;
+	  } else {
+	    return true;
 	  }
 	} else {
 	  if(input == "\""){

@@ -46,8 +46,8 @@ string expression::starToNFA(vector<expression> loe1, string startState, vector<
   //Create a new state so signify we are doing the action (more than 0 times)
   string state1 = "q" + to_string(states->size());
   states->push_back(state1);
-  transitionTable->operator[](startState)[' '].push_back(state1);
-  //Loop though list so we can loop thougb mutliple times
+  transitionTable->operator[](startState)[1].push_back(state1);
+  //Loop though list so we can loop though mutliple times
   string currentState = state1;
   for(unsigned i = 0; i < loe1.size(); ++i){
     currentState = loe1[i].toNFA(currentState, states, transitionTable, alphabet);
@@ -56,11 +56,11 @@ string expression::starToNFA(vector<expression> loe1, string startState, vector<
   string state2 = "q" + to_string(states->size());
   states->push_back(state2);
   //Transition for simplicity
-  transitionTable->operator[](currentState)[' '].push_back(state2);
+  transitionTable->operator[](currentState)[1].push_back(state2);
   //Transition to skip this operation (0 times)
-  transitionTable->operator[](startState)[' '].push_back(state2);
+  transitionTable->operator[](startState)[1].push_back(state2);
   //Transition to loop back
-  transitionTable->operator[](state2)[' '].push_back(state1);
+  transitionTable->operator[](state2)[1].push_back(state1);
   
   return state2;
 }
@@ -76,7 +76,7 @@ string expression::orToNFA(vector<expression> loe1, vector<expression> loe2, str
     currentState = loe1[i].toNFA(currentState, states, transitionTable, alphabet);
   }
   //link the list of states to the end state
-  transitionTable->operator[](currentState)[' '].push_back(endState);
+  transitionTable->operator[](currentState)[1].push_back(endState);
 
   //start back at the begining
   currentState = startState;
@@ -85,7 +85,7 @@ string expression::orToNFA(vector<expression> loe1, vector<expression> loe2, str
     currentState = loe2[i].toNFA(currentState, states, transitionTable, alphabet);
   }
   //connect the second link to the end state
-  transitionTable->operator[](currentState)[' '].push_back(endState);
+  transitionTable->operator[](currentState)[1].push_back(endState);
   
   return endState;
 }
