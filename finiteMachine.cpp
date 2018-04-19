@@ -8,10 +8,12 @@
 
 using namespace std;
 
+//Description: Basic constructor for finiteMachine
 finiteMachine::finiteMachine(){
   isDFA = false;
 }
 
+//Description: Constructor for finiteMachine with the 5 tuple arguments
 finiteMachine::finiteMachine(vector<string> states, vector<char> alphabet, map<string,map<char,vector<string> > > transitionTable, string startState, vector<string> acceptStates)
 {
   states_ = states;
@@ -22,6 +24,7 @@ finiteMachine::finiteMachine(vector<string> states, vector<char> alphabet, map<s
   isDFA = false;
 }
 
+//Description: Constructor for finiteMachine to make a regular expression
 finiteMachine::finiteMachine(string regex){
   expression ex(regex);
   string start = "q0";
@@ -32,6 +35,7 @@ finiteMachine::finiteMachine(string regex){
   isDFA = false;
 }
 
+//Description: Constructor for finiteMachine to make a regular expression from an expression object
 finiteMachine::finiteMachine(expression ex){
   string start = "q0";
   states_.push_back(start);
@@ -41,6 +45,16 @@ finiteMachine::finiteMachine(expression ex){
   isDFA = false;
 }
 
+/*
+  Function: run2()
+  Arguments: string input
+             map<string,map<char,vector<string> > > transitionTable
+	     string startState
+	     vector<string> acceptStates
+	     vector<char>alphabet
+  Returns: bool - if the input is accepted
+  Description: Checks if the input is part of the language of the machine for a DFA
+*/
 bool run2(string input, map<string,map<char,vector<string> > > transitionTable, string startState, vector<string> acceptStates, vector<char>alphabet){
   string state = startState;
   vector<string> states;
@@ -66,6 +80,7 @@ bool run2(string input, map<string,map<char,vector<string> > > transitionTable, 
   return true;
 }
 
+//Description: Checks if the input is part of the language of the machine
 bool finiteMachine::run(string input){
   if(!isDFA){
     vector<string> epsilons;
@@ -75,8 +90,7 @@ bool finiteMachine::run(string input){
   return run2(input, transitionTable_, startState_, acceptStates_, alphabet_);
 }
 
-
-
+//Description: Converts the current machine into a DFA
 finiteMachine finiteMachine::toDFA(){
   // We already have the transition table
   map<string,map<char,vector<string> > > newTransitionTable;
@@ -152,6 +166,7 @@ finiteMachine finiteMachine::toDFA(){
   return newMachine;
 }
 
+//Description: checks if there is a transition to another state from the current state
 bool finiteMachine::run_sub(string currentState, string input){
   //std::cout << "In sub in " << currentState << " State:" << input << "\n";
   if (input.empty()){
@@ -173,6 +188,7 @@ bool finiteMachine::run_sub(string currentState, string input){
   }
 }
 
+//Description: checks if there is an empty transition to another state from the current state
 bool finiteMachine::run_eps(string currentState, string input, vector<string> epsilons){
   //std::cout << "In eps in " << currentState << " State:" << input << "\n";
   for (unsigned i = 0; i < epsilons.size(); ++i){
@@ -197,6 +213,7 @@ bool finiteMachine::run_eps(string currentState, string input, vector<string> ep
   return results | run_sub(currentState, input);
 }
 
+//Description: checks if a state is in the set of accept states
 bool finiteMachine::isAcceptState(string state){
   for (unsigned i = 0; i < acceptStates_.size(); ++i){
     if (acceptStates_[i] == state){
@@ -206,14 +223,17 @@ bool finiteMachine::isAcceptState(string state){
   return false;
 }
 
+//Description: returns all the transitions for the current state given the input
 vector<string> finiteMachine::findTransitions(string currentState, char input){
   return transitionTable_[currentState][input];
 }
 
+//Description: See if a set of states holds a final state
 string finiteMachine::getStartState(){
   return startState_;
 }
 
+//Description: returns all the empty transitions for the current state given the input
 vector<string> finiteMachine::findEmptyStateList(string state, vector<string> seenStates){
   if(find(seenStates.begin(), seenStates.end(), state) != seenStates.end()){
     return seenStates;
@@ -231,6 +251,7 @@ vector<string> finiteMachine::findEmptyStateList(string state, vector<string> se
   return seenStates;
 }
 
+//Description: Combines the states and gives a new name
 string finiteMachine::findStateName(vector<string> strings){
   string name = "";
   sort(strings.begin(), strings.end());
@@ -243,6 +264,7 @@ string finiteMachine::findStateName(vector<string> strings){
   return name;
 }
 
+//Description: See if a set of states holds a final state
 bool finiteMachine::hasAcceptState(vector<string> strings){
   bool accept = false;
   for(unsigned l = 0; l < strings.size(); ++l){
@@ -253,6 +275,7 @@ bool finiteMachine::hasAcceptState(vector<string> strings){
   return accept;
 }
 
+//Description: Prints contents of the machine to the screen
 void finiteMachine::printMachine(){
   for(unsigned i = 0; i < states_.size(); ++i){
     map<char, vector <string > > tempMap = transitionTable_[states_[i]];
@@ -277,6 +300,7 @@ void finiteMachine::printMachine(){
   }
 }
 
+//Description: Print the machine to a file in Json format
 bool finiteMachine::printJson(string file){
   std::ofstream outfile;
   outfile.open(file);
@@ -361,6 +385,8 @@ bool finiteMachine::printJson(string file){
   outfile.close();
   return false;
 }
+
+//Description: Load the machine from a file in Json format
 bool finiteMachine::loadJson(string file){
   std::ifstream infile;
   string input;

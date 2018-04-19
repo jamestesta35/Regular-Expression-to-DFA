@@ -7,13 +7,14 @@
 
 using namespace std;
 
+//Description: Basic constructor for expression
 expression::expression(){
   t_star = false;
   t_or = false;
   t_term = false;
   character = "";
 }
-
+//Description: Constructor for expression based on regular expression
 expression::expression(string regex){
   expression ex = parse_ex(regex);
   t_star = ex.t_star;
@@ -23,7 +24,7 @@ expression::expression(string regex){
   loe1 = ex.loe1;
   loe2 = ex.loe2;
 }
-
+//Description: Converts the variables to a NFA based on the expression stored
 string expression::toNFA(string startState, vector<string>* states, map<string, map<char, vector<string> > >* transitionTable, vector<char>* alphabet){
   if(t_term){
     //must be a term
@@ -42,6 +43,7 @@ string expression::toNFA(string startState, vector<string>* states, map<string, 
   return "EndTONFA";
 }
 
+//Converts the expression segment to a star segment of a finite machine
 string expression::starToNFA(vector<expression> loe1, string startState, vector<string>* states, map<string, map<char, vector <string> > >* transitionTable, vector<char>* alphabet){
   //Create a new state so signify we are doing the action (more than 0 times)
   string state1 = "q" + to_string(states->size());
@@ -65,6 +67,7 @@ string expression::starToNFA(vector<expression> loe1, string startState, vector<
   return state2;
 }
 
+//Description: Converts the expression segment to a or segment of a finite machine
 string expression::orToNFA(vector<expression> loe1, vector<expression> loe2, string startState, vector<string>* states, map<string, map<char, vector<string> > >* transitionTable, vector<char>* alphabet){
   //cout << "In OR" << endl;
   string currentState = startState;
@@ -90,6 +93,7 @@ string expression::orToNFA(vector<expression> loe1, vector<expression> loe2, str
   return endState;
 }
 
+//Description: Converts the expression segment to a term of a finite machine
 string expression::termToNFA(string character, string startState, vector<string>* states, map<string, map<char, vector<string> > >* transitionTable, vector<char>* alphabet){
   //cout << "In Term" << endl;
   string newState = "q" + to_string(states->size());
@@ -252,10 +256,12 @@ string expression::termToNFA(string character, string startState, vector<string>
     }
     
     //THIS MUST BE A CHARACTER ESCAPE OR A GROUP OF CHARACTERS
+    std::cerr << "Unable to convert: " << character << " to a term\n";
   }
   return newState;
 }
 
+//Description: Converts an expression into a parsed expression
 expression expression::parse_ex(string reg){
   expression ex, second;
   string substring = "";

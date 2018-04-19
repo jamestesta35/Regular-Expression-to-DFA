@@ -27,3 +27,10 @@ $ ./regex_main -h
 
 ls:
 $ ls_main -h
+
+
+James Testa
+April 2018
+Foundations of Computer Science
+COMP.5020
+james_testa@student.uml.edu

@@ -3,7 +3,6 @@
 #include <string>
 #include <dirent.h>
 #include "finiteMachine.h"
-//#include "expression.h"
 
 /*
   Function: usege()
@@ -137,12 +136,12 @@ int main(int var_num, char** vars){
 	std::cout << "Must provide a file after -l" << std::endl;;
       }
       load = (string)vars[i];
-    }else if ((string)vars[i] == "-f"){
+    }else if ((string)vars[i] == "-f"){ //Check Specific File
       if(++i >= var_num){
 	std::cout << "Must provide a file after -f" << std::endl;;
       }
       file = (string)vars[i];
-    } else if ((string)vars[i] == "-d"){
+    } else if ((string)vars[i] == "-d"){ //Specific Directory
       if(++i >= var_num){
 	std::cout << "Must provide a directory after -d" << std::endl;;
       }

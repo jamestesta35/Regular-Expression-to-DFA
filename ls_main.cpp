@@ -1,9 +1,7 @@
-#include <fstream>
 #include <iostream>
 #include <string>
 #include <dirent.h>
 #include "finiteMachine.h"
-//#include "expression.h"
 
 /*
   Function: usege()
@@ -36,9 +34,7 @@ void help(){
   std::cout << "         -h = Help" << std::endl;
   std::cout << "         -u = Usage" << std::endl;
   std::cout << "         -v = Verbose Mode" << std::endl;
-  std::cout << "              - Adds: Opening File, Finished Checking File" << std::endl;
-  std::cout << "         -v+ = Verbose Plus Mode" << std::endl;
-  std::cout << "              - Adds: All Verbose Mode functionality, Print DFA Used, Opening File, Checing Line" << std::endl;
+  std::cout << "              - Adds: Prints DFA" << std::endl;
   std::cout << "         -dfa = Print DFA" << std::endl;
   std::cout << "              - The next argument will be the specific file to print the DFA used for the regular expression" << std::endl;
   std::cout << "         -nfa = Print NFA" << std::endl;
@@ -73,12 +69,10 @@ int main(int var_num, char** vars){
   DIR *dp;
   struct dirent *ep;
   std::string regex, file = "", reg, directory = "./", print_dfa = "", print_nfa = "", load = "";
-  std::ifstream infile;
   bool exact = false;
   bool help_var = false;
   bool usage_var = false;
   bool verbose = false;
-  bool verbosePlus = false;
 
   //Start of command line argument section
   for(int i = 1; i < var_num; ++i){
@@ -88,9 +82,6 @@ int main(int var_num, char** vars){
       usage_var = true;
     } else if ((string)vars[i] == "-v"){ //Verbose Mode
       verbose = true;
-    } else if ((string)vars[i] == "-v+"){ //Verbose plus Mode
-      verbose = true;
-      verbosePlus = true;
     } else if ((string)vars[i] == "-e"){ //Exact
       exact = true;
     } else if ((string)vars[i] == "-nfa"){ //Print NFA
@@ -103,17 +94,17 @@ int main(int var_num, char** vars){
 	std::cout << "Must provide a file after -dfa" << std::endl;;
       }
       print_dfa = (string)vars[i];
-    }else if ((string)vars[i] == "-l"){ //load json
+    }else if ((string)vars[i] == "-l"){ //Load json
       if(++i >= var_num){
 	std::cout << "Must provide a file after -l" << std::endl;;
       }
       load = (string)vars[i];
-    }else if ((string)vars[i] == "-f"){
+    }else if ((string)vars[i] == "-f"){ //Check Specific File
       if(++i >= var_num){
 	std::cout << "Must provide a file after -f" << std::endl;;
       }
       file = (string)vars[i];
-    } else if ((string)vars[i] == "-d"){
+    } else if ((string)vars[i] == "-d"){ //Specific Directory
       if(++i >= var_num){
 	std::cout << "Must provide a directory after -d" << std::endl;;
       }
@@ -183,7 +174,7 @@ int main(int var_num, char** vars){
     }
   }
     
-  if(verbosePlus)
+  if(verbose)
     DFA.printMachine();
   //Run through all files in the current directory
   if(file != ""){
