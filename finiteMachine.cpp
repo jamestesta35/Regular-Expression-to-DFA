@@ -376,6 +376,7 @@ bool finiteMachine::loadJson(string file){
   isDFA = false;
   infile.open(file);
   if(!infile.is_open()){
+    cout << "Unable to open " << file << "\n";
     return true;
   }
   infile >> input;
@@ -552,6 +553,7 @@ bool finiteMachine::loadJson(string file){
     }
     
     infile >> input;
+    
   }
   
   infile >> input;

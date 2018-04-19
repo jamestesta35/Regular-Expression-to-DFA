@@ -12,7 +12,7 @@
   Description: Gives syntax for regex_main
 */
 void usage(){
-  std::cout << "Usage: regex_main [options] regularExpression" << std::endl;
+  std::cout << "Usage: regex_main [options] [Regular Expression]" << std::endl;
 }
 
 /*
@@ -31,6 +31,8 @@ void help(){
   std::cout << "              - The entire line must match the regular expression exactly" << std::endl;
   std::cout << "         -f = File" << std::endl;
   std::cout << "              - The next argument will be the specific file to check" << std::endl;
+  std::cout << "         -l = Load Finite Machine" << std::endl;
+  std::cout << "              - The next argument will be the specific json file to load a DFA or NFA" << std::endl;
   std::cout << "         -h = Help" << std::endl;
   std::cout << "         -u = Usage" << std::endl;
   std::cout << "         -v = Verbose Mode" << std::endl;
