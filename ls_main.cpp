@@ -64,7 +64,6 @@ void help(){
   Description: Main driver for ls_main
 */
 int main(int var_num, char** vars){
-
   //Variable declaration
   DIR *dp;
   struct dirent *ep;
@@ -154,7 +153,6 @@ int main(int var_num, char** vars){
       cout << "Unable to load Json finite machine from file.\n";
       return 12;
     } else {
-      //cout << "LOADED FROM FILE\n";
     }
   } else {
     NFA = finiteMachine(regex);
@@ -176,18 +174,20 @@ int main(int var_num, char** vars){
     
   if(verbose)
     DFA.printMachine();
-  //Run through all files in the current directory
+  // If there was a specific file given, check that file
   if(file != ""){
     if(DFA.run(file)){
       std::cout << file << "\n";
     }
-  } else {
+  } else { // Open the directory and check the files inside
     const char *direct = directory.c_str();
     dp = opendir (direct);
     if (dp != NULL)
       {
+	//Get the file names
 	while ((ep = readdir (dp))){
 	  file = ep->d_name;
+	  //Ceck the file names
 	  if(DFA.run(file))
 	    cout << file << "\n";
 	}
@@ -197,6 +197,5 @@ int main(int var_num, char** vars){
       std::cerr << "Couldn't open the directory" << std::endl;
     }
   }
-  
   return 0;
 }

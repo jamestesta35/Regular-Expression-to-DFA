@@ -226,6 +226,7 @@ int main(int var_num, char** vars){
       std::cout << "WARNING: Unable to open " << file << " for reading. Unable to check for regex string." << endl;
     }
   } else {
+    directory += "/";
     const char *direct = directory.c_str();
     dp = opendir (direct);
     if (dp != NULL)
@@ -234,14 +235,14 @@ int main(int var_num, char** vars){
 	  file = ep->d_name;
 	  if(verbosePlus)
 	    std::cout << "Opening file: " << file << std::endl;
-	  infile.open(file);
-	  if(infile){
+	  infile.open(direct+file, ios::in);
+	  if(infile.is_open()){
 	    if(verbose)
 	      std::cout << "Opened file: " << file << std::endl;
 	    currentTotal = checkFile(file, &infile, &DFA, verbose, verbosePlus);
 	    total += currentTotal;
 	  } else {
-	    std::cout << "WARNING: Unable to open " << file << " for reading. Unable to check for regex string." << endl;
+	    std::cout << "WARNING: Unable to open " << direct+file << " for reading. Unable to check for regex string." << endl;
 	  }
 	  infile.close();
 	  if(verbose)

@@ -26,6 +26,7 @@ finiteMachine::finiteMachine(vector<string> states, vector<char> alphabet, map<s
 
 //Description: Constructor for finiteMachine to make a regular expression
 finiteMachine::finiteMachine(string regex){
+  cout << "Here\n";
   expression ex(regex);
   string start = "q0";
   states_.push_back(start);

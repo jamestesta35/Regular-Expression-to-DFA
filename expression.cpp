@@ -265,14 +265,22 @@ string expression::termToNFA(string character, string startState, vector<string>
 expression expression::parse_ex(string reg){
   expression ex, second;
   string substring = "";
+  int paren;
   for(unsigned i = 0; i < reg.size(); ++i){
+    //cout << reg[i] << " - " << i << "\n";
     expression sub;
     switch(reg[i]){
     case '[':
-      while(reg[i] != ']'){
-	sub.character += reg[i];
-	++i;
+      paren = 0;
+      while((reg[++i] != ']' || paren > 0) && i < reg.size()){
+	if(reg[i] == '[')
+	  ++paren;
+	if(reg[i] == ']')
+	  --paren;
+	substring += reg[i];
       }
+      if(i >= reg.size() || reg[i] != ']')
+	cerr << "Error in the regular expression\n";
       sub.character += ']';
       sub.t_term = true;
       break;
@@ -296,9 +304,16 @@ expression expression::parse_ex(string reg){
       i = reg.size();
       break;
     case '(':
-      while(reg[++i] != ')'){
+      paren = 0;
+      while((reg[++i] != ')' || paren > 0) && i < reg.size()){
+	if(reg[i] == '(')
+	  ++paren;
+	if(reg[i] == ')')
+	  --paren;
 	substring += reg[i];
       }
+      if(i >= reg.size() || reg[i] != ')')
+	cerr << "Error in the regular expression\n";
       sub = parse_ex(substring);
       substring = "";
       break;
