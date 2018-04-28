@@ -29,6 +29,8 @@ ls:
 $ ls_main -h
 
 
+*note: For sample input/output red the file "sample_output.txt"
+
 James Testa
 April 2018
 Foundations of Computer Science
