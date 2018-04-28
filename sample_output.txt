@@ -1,0 +1,89 @@
+***************************************************************************
+This file is to show a sample output of commands for ls_main and regex_main
+Format:
+user$ [command]
+[output]
+***************************************************************************
+user$ ./regex_main -h
+This is the help menu for regex_main
+To use: $./regex_main
+Usage: regex_main [options] [Regular Expression]
+Options: -d = Directory
+              - The next argument will set the new directory pointer
+         -e = Exact
+              - The entire line must match the regular expression exactly
+         -f = File
+              - The next argument will be the specific file to check
+         -l = Load Finite Machine
+              - The next argument will be the specific json file to load a DFA or NFA
+         -h = Help
+         -u = Usage
+         -v = Verbose Mode
+              - Adds: Opening File, Finished Checking File
+         -v+ = Verbose Plus Mode
+              - Adds: All Verbose Mode functionality, Print DFA Used, Opening File, Checing Line
+         -dfa = Print DFA
+              - The next argument will be the specific file to print the DFA used for the regular expression
+         -nfa = Print NFA
+              - The next argument will be the specific file to print the NFA used for the regular expression
+Regular Expression:
+	Characters: ascii characters 'space' -> '~'
+	            \d: One digit from 0-9
+	            \w: One word character (letter, digit, underscore)
+	            \s: One whitespace character (space, tab, newline, carriage return, vertical tab)
+	            \D: One character that is not a digit
+	            \W: One character that is not a word character
+	            \S: One character that is not a whitespace character
+	            . : Wild card (space -> ~)
+	Sequences:  [...]: Any character in the [] ([abc], [3d8])
+	            [.-.]: Any character between the two ascii characters ([a-z], [0-9])
+	Other:      *    : 0 or more times applied to the previous group or character
+	            (...): Capture Group to group sequences of characters/strings
+	Note: You can concatinate these characters/sequences by typing them next to each other in a string format
+	
+***************************************************************************
+user$ ./regex_main -u
+Usage: regex_main [options] [Regular Expression]
+
+***************************************************************************
+user$ ./regex_main -d example/ Hello
+main.cpp:8:  std::cout << "Hello World!";
+Found 1 results for: Hello
+
+***************************************************************************
+user$ ./regex_main -d example/ -e Helper_File
+helper.h:7:Helper_File
+Found 1 results for: Helper_File
+
+***************************************************************************
+user$ ./regex_main -f ./example/helper.h Helper_File
+./example/helper.h:7:Helper_File
+Found 1 results for: Helper_File
+
+***************************************************************************
+user$ ./regex_main -l example/sample_json.txt -d example/
+helper.h:5://The file sample_json.txt in this directory should find lines that have the phrase "finiteMachine"
+Found 1 results for loaded finite machine
+
+***************************************************************************
+user$ ./regex_main -v -d example/ Hello
+Opened file: .
+Finished checking file: .
+Found 0 results in file: .
+Opened file: ..
+Finished checking file: ..
+Found 0 results in file: ..
+Opened file: helper.h
+Finished checking file: helper.h
+Found 0 results in file: helper.h
+Opened file: .DS_Store
+Finished checking file: .DS_Store
+Found 0 results in file: .DS_Store
+Opened file: sample_json.txt
+Finished checking file: sample_json.txt
+Found 0 results in file: sample_json.txt
+Opened file: main.cpp
+main.cpp:8:  std::cout << "Hello World!";
+Finished checking file: main.cpp
+Found 1 results in file: main.cpp
+Found 1 results for: Hello
